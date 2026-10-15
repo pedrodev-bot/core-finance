@@ -70,3 +70,39 @@ def get_transaction(transaction_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Transaction not found")
         
     return transaction
+
+@app.put("/transactions/{transaction_id}", response_model=schemas.TransactionResponse)
+def update_transaction(transaction_id: int, transaction: schemas.TransactionCreate, db: Session = Depends(get_db)):
+    """
+    Update an existing transaction by its ID.
+    """
+    db_transaction = db.query(models.Transaction).filter(models.Transaction.id == transaction_id).first()
+
+    if db_transaction:
+        db_transaction.title = transaction.title
+        db_transaction.amount = transaction.amount
+        db_transaction.transaction_type = transaction.transaction_type
+        db_transaction.category = transaction.category
+
+        db.commit()
+        db.refresh(db_transaction)
+
+        return db_transaction
+    else:
+        raise HTTPException(status_code=404, detail="Transaction not found")
+
+@app.delete("/transactions/{transaction_id}")
+def delete_transaction(transaction_id: int, db: Session = Depends(get_db)):
+    """
+    Delete an existing transaction by its ID.
+    """
+
+    db_transaction = db.query(models.Transaction).filter(models.Transaction.id == transaction_id).first()
+
+    if db_transaction:
+        db.delete(db_transaction)
+        db.commit()
+
+        return {"message": "Transaction deleted successfully"}
+    else:
+        raise HTTPException(status_code=404, detail="Transaction not found")
