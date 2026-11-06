@@ -1,56 +1,23 @@
-# Welcome to your Expo app 👋
+# Core Finance 💸
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+An offline-first financial management app focused on performance, rapid data entry, and clean architecture.
 
-## Get started
+## 🚀 Current State: Transactions MVP
+The core financial tracking module is complete and fully functional.
 
-1. Install dependencies
+* **Transactions CRUD:** Insert, edit, and soft-delete records.
+* **Financial Typing:** Logical and visual separation between Expenses (🔴), Incomes (🟢), and Investments (🔵).
+* **Global FAB (Floating Action Button):** Quick access menu overlaid on the main navigation.
+* **Currency Masks:** Real-time formatting during typing to ensure data integrity.
+* **Local Persistence:** Global state managed natively with zero delays.
 
-   ```bash
-   npm install
-   ```
+## 🛠️ Tech Stack
+* **Framework:** React Native with Expo (SDK 58) and Expo Router (File-based routing)
+* **Language:** TypeScript
+* **State Management:** Zustand + AsyncStorage
+* **UI/UX:** Native components, Ionicons, FontAwesome5
 
-2. Start the app
-
-   ```bash
-   npx expo start
-   ```
-
-In the output, you'll find options to open the app in a
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Get a fresh project
-
-When you're ready, run:
-
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-### Other setup steps
-
-- To set up ESLint for linting, run `npx expo lint`, or follow our guide on ["Using ESLint and Prettier"](https://docs.expo.dev/guides/using-eslint/)
-- If you'd like to set up unit testing, follow our guide on ["Unit Testing with Jest"](https://docs.expo.dev/develop/unit-testing/)
-- Learn more about the TypeScript setup in this template in our guide on ["Using TypeScript"](https://docs.expo.dev/guides/typescript/)
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+## 🗺️ Roadmap & Next Steps
+- [ ] **Overview (Home):** Dashboard consolidating the Current Balance and expense/income summaries.
+- [ ] **Authentication:** Access control and user login system.
+- [ ] **Sync Queue:** Background synchronization with the FastAPI backend for cloud persistence.
