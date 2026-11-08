@@ -1,107 +1,168 @@
-import { useRef } from 'react';
+import { useRef, useMemo } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
-import { useTransactionStore, Transaction } from '../../../store/transactionStore';
+import { useThemeStore } from '../../../stores/useThemeStore';
+import { useTransactionStore, Transaction } from '../../../stores/transactionStore';
+import { useAuthStore } from '../../../stores/useAuthStore';
 
 export default function TransactionsListScreen() {
-  const allTransactions = useTransactionStore((state) => state.transactions);
-  const transactions = allTransactions.filter((tx) => !tx.deleted);
   const router = useRouter();
-  
+  const theme = useThemeStore((state) => state.theme);
+  const currentUserId = useAuthStore((state) => state.user?.id);
+  const allTransactions = useTransactionStore((state) => state.transactions);
+
+  const transactions = useMemo(() => {
+    return allTransactions.filter((t) => t.userId === currentUserId);
+  }, [allTransactions, currentUserId]);
+
   const isNavigating = useRef(false);
 
   const handlePress = (id: string) => {
-    if (isNavigating.current) return; 
+    if (isNavigating.current) return;
     isNavigating.current = true;
-    
+
     router.push({
       pathname: '/transactions/[id]',
-      params: { id }
+      params: { id },
     });
-    
+
     setTimeout(() => {
       isNavigating.current = false;
     }, 500);
   };
 
   const renderTransaction = ({ item }: { item: Transaction }) => {
-    const type = item.type || 'expense'; 
-    
-    let color = '#ef4444'; 
+    const type = item.type || 'expense';
+
+    let color = theme.expense;
     let iconElement = <Ionicons name="arrow-down" size={16} color={color} style={styles.icon} />;
 
     if (type === 'income') {
-      color = '#22c55e'; 
+      color = theme.income;
       iconElement = <Ionicons name="arrow-up" size={16} color={color} style={styles.icon} />;
     } else if (type === 'investment') {
-      color = '#0ea5e9'; 
-      iconElement = <FontAwesome5 name="coins" size={14} color={color} style={styles.icon} />; 
+      color = theme.investment;
+      iconElement = <FontAwesome5 name="coins" size={14} color={color} style={styles.icon} />;
     }
 
     return (
-      <TouchableOpacity 
-        style={styles.card} 
+      <TouchableOpacity
         activeOpacity={0.7}
-        onPress={() => handlePress(item.id)} 
+        onPress={() => handlePress(item.id)}
+        style={[
+          styles.card,
+          {
+            backgroundColor: theme.card,
+            borderColor: theme.cardBorder,
+          },
+        ]}
       >
-        <View style={styles.cardHeader}>
-          <Text style={styles.description}>{item.description}</Text>
-          
-          <View style={styles.amountContainer}>
-            <Text style={[styles.amount, { color }]}>
-              R$ {item.amount.toFixed(2).replace('.', ',')}
-            </Text>
-            {iconElement}
-          </View>
+        <View style={styles.cardInfo}>
+          <Text style={[styles.cardTitle, { color: theme.textPrimary }]}>
+            {item.description}
+          </Text>
+          <Text style={[styles.cardDate, { color: theme.textSecondary }]}>
+            {new Date(item.date).toLocaleDateString('pt-BR')}
+          </Text>
         </View>
-        
-        <Text style={styles.date}>
-          {new Date(item.date).toLocaleDateString('pt-BR')}
-        </Text>
+
+        <View style={styles.amountContainer}>
+          <Text style={[styles.cardAmount, { color }]}>
+            R$ {item.amount.toFixed(2).replace('.', ',')}
+          </Text>
+          {iconElement}
+        </View>
       </TouchableOpacity>
     );
   };
 
   return (
-    <View style={styles.container}>
-      {transactions.length === 0 ? (
-        <View style={styles.emptyContainer}>
-          <Text style={styles.emptyText}>Nenhuma transação ainda.</Text>
-        </View>
-      ) : (
-        <FlatList
-          data={transactions}
-          keyExtractor={(item) => item.id}
-          renderItem={renderTransaction}
-          contentContainerStyle={styles.listContent}
-        />
-      )}
-    </View>
+    <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]} edges={['top', 'left', 'right']}>
+      <View style={styles.headerContainer}>
+        <Text style={styles.headerSubtitle}>HISTÓRICO</Text>
+        <Text style={[styles.headerTitle, { color: theme.textPrimary }]}>Minhas Transações</Text>
+      </View>
+      <FlatList
+        data={transactions}
+        keyExtractor={(item) => item.id}
+        renderItem={renderTransaction}
+        contentContainerStyle={styles.listContent}
+        ListEmptyComponent={
+          <View style={styles.emptyContainer}>
+            <Text style={[styles.emptyText, { color: theme.textSecondary }]}>
+              Nenhuma transação cadastrada.
+            </Text>
+          </View>
+        }
+      />
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
-  emptyContainer: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  emptyText: { fontSize: 16, color: '#666' },
-  listContent: { padding: 16, paddingBottom: 100 }, 
-  card: {
-    backgroundColor: '#f9f9f9',
-    padding: 16,
-    borderRadius: 12,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: '#f0f0f0',
+  container: {
+    flex: 1,
   },
-  cardHeader: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 8, alignItems: 'center' },
-  description: { fontSize: 16, fontWeight: '500', color: '#333', flex: 1 },
+  headerContainer: {
+  paddingHorizontal: 20,
+  paddingTop: 16,
+  paddingBottom: 12,
+  },
+  headerSubtitle: {
+    fontSize: 12,
+    color: '#8E8E93',
+    fontWeight: '600',
+    letterSpacing: 0.5,
+    textTransform: 'uppercase',
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: '700',
+    marginTop: 2,
+  },
+  listContent: {
+    paddingHorizontal: 16,
+    paddingBottom: 100,
+    gap: 8,
+  },
+  card: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 16,
+    borderRadius: 14,
+    borderWidth: 1,
+  },
+  cardInfo: {
+    flex: 1,
+  },
+  cardTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  cardDate: {
+    fontSize: 12,
+    marginTop: 4,
+  },
   amountContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginLeft: 12,
+    gap: 6,
   },
-  amount: { fontSize: 16, fontWeight: 'bold' },
-  icon: { marginLeft: 6 },
-  date: { fontSize: 12, color: '#888' }
+  cardAmount: {
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  icon: {
+    marginLeft: 4,
+  },
+  emptyContainer: {
+    paddingTop: 60,
+    alignItems: 'center',
+  },
+  emptyText: {
+    fontSize: 15,
+  },
 });

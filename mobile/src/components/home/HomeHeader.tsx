@@ -1,0 +1,38 @@
+import React from 'react';
+import { View, Text, StyleSheet } from 'react-native';
+
+interface HomeHeaderProps {
+  userName: string;
+}
+
+export function HomeHeader({ userName }: HomeHeaderProps) {
+  return (
+    <View style={styles.container}>
+      <Text style={styles.subtitle}>Início</Text>
+      <Text style={styles.title}>Olá, {userName}</Text>
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    paddingHorizontal: 20,
+    paddingVertical: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: '#1E1E24',
+    backgroundColor: '#121216',
+  },
+  subtitle: {
+    fontSize: 12,
+    color: '#8E8E93',
+    textTransform: 'uppercase',
+    letterSpacing: 0.8,
+    fontWeight: '600',
+  },
+  title: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    marginTop: 2,
+  },
+});

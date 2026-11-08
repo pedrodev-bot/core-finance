@@ -1,108 +1,84 @@
-from fastapi import FastAPI, Depends, HTTPException
-from database import engine, Base, SessionLocal
+from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 import models
-import schemas 
+import schemas
+from database import engine, Base, get_db
 
 Base.metadata.create_all(bind=engine)
 
-app = FastAPI(
-    title="Finance Tracker API",
-    description="Core backend for the multi-platform finance tracker.",
-    version="1.0.0"
+app = FastAPI(title="Core Finance API")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
-@app.get("/")
-def health_check():
-    """
-    Root endpoint to verify if the API is up and running.
-    """
+@app.post("/auth/register", response_model=schemas.LoginResponse)
+def register(creds: schemas.LoginRequest, db: Session = Depends(get_db)):
+    clean_username = creds.username.strip().lower()
+
+    if not clean_username:
+        raise HTTPException(status_code=400, detail="Usuário não pode ser vazio.")
+
+    existing_user = db.query(models.User).filter(models.User.username == clean_username).first()
+
+    if existing_user is not None:
+        raise HTTPException(status_code=400, detail="Este nome de usuário já está em uso.")
+
+    new_user = models.User(
+        username=clean_username,
+        name=clean_username.capitalize(),
+        hashed_password=creds.password
+    )
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+
     return {
-        "status": "success",
-        "message": "Finance Tracker API is online and ready.",
-        "environment": "development"
+        "token": f"jwt-fake-{new_user.id}",
+        "user": new_user
     }
 
-
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-@app.post("/transactions/", response_model=schemas.TransactionResponse)
-def create_transaction(transaction: schemas.TransactionCreate, db: Session = Depends(get_db)):
-    """
-    Create a new financial transaction in database.
-    """
-    new_transaction = models.Transaction(
-        title=transaction.title,
-        amount=transaction.amount,
-        transaction_type=transaction.transaction_type,
-        category=transaction.category
-    )
-
-    db.add(new_transaction)
-    db.commit()
-    db.refresh(new_transaction)
-
-    return new_transaction
-
-@app.get("/transactions/", response_model=list[schemas.TransactionResponse])
-def list_transactions(db: Session = Depends(get_db)):
-    """
-    Retrieve all financial transactions from the database.
-    """
-    transactions = db.query(models.Transaction).all()
-
-    return transactions
-
-@app.get("/transactions/{transaction_id}", response_model=schemas.TransactionResponse)
-def get_transaction(transaction_id: int, db: Session = Depends(get_db)):
-    """
-    Retrieve a specific transaction by its ID.
-    """
-    transaction = db.query(models.Transaction).filter(models.Transaction.id == transaction_id).first()
+@app.post("/auth/login", response_model=schemas.LoginResponse)
+def login(creds: schemas.LoginRequest, db: Session = Depends(get_db)):
+    username = creds.username.strip().lower()
     
-    if transaction is None:
-        raise HTTPException(status_code=404, detail="Transaction not found")
-        
-    return transaction
+    existing_user = db.query(models.User).filter(models.User.username == creds.username).first()
 
-@app.put("/transactions/{transaction_id}", response_model=schemas.TransactionResponse)
-def update_transaction(transaction_id: int, transaction: schemas.TransactionCreate, db: Session = Depends(get_db)):
-    """
-    Update an existing transaction by its ID.
-    """
-    db_transaction = db.query(models.Transaction).filter(models.Transaction.id == transaction_id).first()
-
-    if db_transaction:
-        db_transaction.title = transaction.title
-        db_transaction.amount = transaction.amount
-        db_transaction.transaction_type = transaction.transaction_type
-        db_transaction.category = transaction.category
-
+    if not existing_user:
+        user = models.User(
+            username=username,
+            name=username.capitalize(),
+            hashed_password=creds.password
+        )
+        db.add(user)
         db.commit()
-        db.refresh(db_transaction)
+        db.refresh(user)
+        return {
+            "token": f"jwt-fake-{user.id}",
+            "user": user
+        }
 
-        return db_transaction
-    else:
-        raise HTTPException(status_code=404, detail="Transaction not found")
+    if str(existing_user.hashed_password) != creds.password:
+        raise HTTPException(status_code=400, detail="Senha incorreta para este usuário.")
 
-@app.delete("/transactions/{transaction_id}")
-def delete_transaction(transaction_id: int, db: Session = Depends(get_db)):
-    """
-    Delete an existing transaction by its ID.
-    """
+    return {
+        "token": f"jwt-fake-{existing_user.id}",
+        "user": existing_user
+    }
 
-    db_transaction = db.query(models.Transaction).filter(models.Transaction.id == transaction_id).first()
+@app.get("/users/{user_id}/transactions", response_model=list[schemas.TransactionResponse])
+def get_user_transactions(user_id: str, db: Session = Depends(get_db)):
+    return db.query(models.Transaction).filter(models.Transaction.user_id == user_id).all()
 
-    if db_transaction:
-        db.delete(db_transaction)
-        db.commit()
-
-        return {"message": "Transaction deleted successfully"}
-    else:
-        raise HTTPException(status_code=404, detail="Transaction not found")
+@app.post("/users/{user_id}/transactions", response_model=schemas.TransactionResponse)
+def create_transaction(user_id: str, tx: schemas.TransactionCreate, db: Session = Depends(get_db)):
+    new_tx = models.Transaction(**tx.model_dump(), user_id=user_id)
+    db.add(new_tx)
+    db.commit()
+    db.refresh(new_tx)
+    return new_tx

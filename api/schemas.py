@@ -1,18 +1,38 @@
-from datetime import datetime
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel
+from typing import Optional
+
+class UserBase(BaseModel):
+    username: str
+    name: str
+
+class UserCreate(UserBase):
+    password: str
+
+class UserResponse(UserBase):
+    id: str
+    class Config:
+        from_attributes = True
 
 class TransactionBase(BaseModel):
-    title: str
+    description: str
     amount: float
-    transaction_type: str
-    category: str
-
+    date: str
+    type: str
 
 class TransactionCreate(TransactionBase):
     pass
 
 class TransactionResponse(TransactionBase):
-    id: int
-    created_at: datetime
+    id: str
+    user_id: str
+    synced: bool
+    class Config:
+        from_attributes = True
 
-    model_config = ConfigDict(from_attributes=True)
+class LoginRequest(BaseModel):
+    username: str
+    password: str
+
+class LoginResponse(BaseModel):
+    token: str
+    user: UserResponse

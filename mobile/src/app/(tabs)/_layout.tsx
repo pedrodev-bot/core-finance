@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { Tabs, useRouter } from 'expo-router';
-import { View, Text, StyleSheet, Modal, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Modal, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useThemeStore } from '../../stores/useThemeStore';
 import { GlobalFAB } from '../../components/GlobalFAB';
 
 export default function TabLayout() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const router = useRouter();
+  const theme = useThemeStore((state) => state.theme);
 
   const handleNavigate = (route: string) => {
     setIsMenuOpen(false);
@@ -14,116 +16,156 @@ export default function TabLayout() {
   };
 
   return (
-    <View style={{ flex: 1 }}>
-      <Tabs screenOptions={{ 
-        tabBarActiveTintColor: '#a3e635',
-        tabBarInactiveTintColor: '#888',
-      }}>
-        <Tabs.Screen 
-          name="index" 
-          options={{ 
+    <View style={{ flex: 1, backgroundColor: theme.background }}>
+      <Tabs
+        screenOptions={{
+          headerShown: false,
+          tabBarButton: (props) => (
+            <TouchableOpacity
+              onPress={props.onPress}
+              onLongPress={props.onLongPress}
+              accessibilityRole={props.accessibilityRole}
+              accessibilityState={props.accessibilityState}
+              style={props.style}
+              activeOpacity={0.7}
+            >
+              {props.children}
+            </TouchableOpacity>
+          ),
+          tabBarStyle: {
+            backgroundColor: theme.tabBarBg,
+            borderTopColor: theme.tabBarBorder,
+            elevation: 0,
+            borderTopWidth: 1,
+            paddingTop: 6,
+          },
+          tabBarActiveTintColor: theme.accent,
+          tabBarInactiveTintColor: theme.textSecondary,
+        }}
+      >
+        <Tabs.Screen
+          name="index"
+          options={{
             title: 'Início',
-            tabBarIcon: ({ color }: any) => <Ionicons name="home-outline" size={24} color={color} />
-          }} 
-        />
-        <Tabs.Screen 
-          name="transactions" 
-          options={{ 
-            title: 'Transações', 
             headerShown: false,
-            tabBarIcon: ({ color }: any) => <Ionicons name="wallet-outline" size={24} color={color} />
-          }} 
+            tabBarIcon: ({ color }: any) => <Ionicons name="home-outline" size={22} color={color} />,
+          }}
         />
-        <Tabs.Screen 
-          name="menu" 
-          options={{ 
+        <Tabs.Screen
+          name="transactions"
+          options={{
+            title: 'Transações',
+            headerShown: false,
+            tabBarIcon: ({ color }: any) => <Ionicons name="wallet-outline" size={22} color={color} />,
+          }}
+        />
+        <Tabs.Screen
+          name="menu"
+          options={{
             title: 'Menu',
-            tabBarIcon: ({ color }: any) => <Ionicons name="menu-outline" size={24} color={color} />
+            tabBarIcon: ({ color }: any) => <Ionicons name="menu-outline" size={22} color={color} />,
           }}
           listeners={{
             tabPress: (e) => {
-              e.preventDefault(); 
-              setIsMenuOpen(true); 
+              e.preventDefault();
+              setIsMenuOpen(true);
             },
           }}
         />
       </Tabs>
-      
+
       <GlobalFAB />
 
-      <Modal visible={isMenuOpen} transparent animationType="fade">
-        <TouchableOpacity 
-          style={styles.overlay} 
-          activeOpacity={1} 
-          onPress={() => setIsMenuOpen(false)} 
-        >
-          <View style={styles.floatingBox}>
-            <View style={styles.boxHeader}>
-              <Text style={styles.boxTitle}>Navegação</Text>
-              <TouchableOpacity onPress={() => setIsMenuOpen(false)}>
-                <Ionicons name="close" size={24} color="#9ca3af" />
-              </TouchableOpacity>
-            </View>
+      <Modal
+        visible={isMenuOpen}
+        transparent
+        animationType="fade"
+        statusBarTranslucent
+        onRequestClose={() => setIsMenuOpen(false)}
+      >
+        <TouchableWithoutFeedback onPress={() => setIsMenuOpen(false)}>
+          <View style={[styles.modalBackdrop, { backgroundColor: theme.modalOverlay }]}>
+            <TouchableWithoutFeedback>
+              <View
+                style={[
+                  styles.floatingBox,
+                  {
+                    backgroundColor: theme.card,
+                    borderColor: theme.cardBorder,
+                  },
+                ]}
+              >
+                <View style={[styles.boxHeader, { borderBottomColor: theme.cardBorder }]}>
+                  <Text style={[styles.boxTitle, { color: theme.textPrimary }]}>Navegação</Text>
+                  <TouchableOpacity
+                    onPress={() => setIsMenuOpen(false)}
+                    hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+                  >
+                    <Ionicons name="close" size={20} color={theme.textSecondary} />
+                  </TouchableOpacity>
+                </View>
 
-            <TouchableOpacity style={styles.menuItem} onPress={() => handleNavigate('/')}>
-              <Ionicons name="home-outline" size={20} color="#4b5563" />
-              <Text style={styles.menuText}>Início</Text>
-            </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.menuItem}
+                  activeOpacity={0.7}
+                  onPress={() => handleNavigate('/')}
+                >
+                  <Ionicons name="home-outline" size={20} color={theme.textPrimary} />
+                  <Text style={[styles.menuText, { color: theme.textPrimary }]}>Início</Text>
+                </TouchableOpacity>
 
-            <TouchableOpacity style={styles.menuItem} onPress={() => handleNavigate('/transactions')}>
-              <Ionicons name="list-outline" size={20} color="#4b5563" />
-              <Text style={styles.menuText}>Transações</Text>
-            </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.menuItem}
+                  activeOpacity={0.7}
+                  onPress={() => handleNavigate('/transactions')}
+                >
+                  <Ionicons name="wallet-outline" size={20} color={theme.textPrimary} />
+                  <Text style={[styles.menuText, { color: theme.textPrimary }]}>Transações</Text>
+                </TouchableOpacity>
+              </View>
+            </TouchableWithoutFeedback>
           </View>
-        </TouchableOpacity>
+        </TouchableWithoutFeedback>
       </Modal>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  overlay: {
+  modalBackdrop: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.15)',
+    backgroundColor: 'rgba(0,0,0,0.75)',
     justifyContent: 'flex-end',
-    alignItems: 'flex-end', 
+    alignItems: 'flex-end',
   },
   floatingBox: {
-    backgroundColor: '#fff',
-    width: 220,
+    width: 230,
     borderRadius: 16,
+    borderWidth: 1,
     padding: 16,
     marginRight: 16,
-    marginBottom: 90, 
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 8,
-    elevation: 5,
+    marginBottom: 85,
   },
   boxHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
-    paddingBottom: 12,
+    paddingBottom: 14,
+    marginBottom: 8,
     borderBottomWidth: 1,
-    borderBottomColor: '#f3f4f6',
   },
   boxTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#1f2937',
+    fontSize: 17,
+    fontWeight: '700',
   },
   menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 12,
+    gap: 12,
   },
   menuText: {
     fontSize: 16,
-    marginLeft: 12,
-    color: '#374151',
     fontWeight: '500',
   },
 });

@@ -6,6 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 
 export interface Transaction {
   id: string;
+  userId: string;
   amount: number;
   description: string;
   date: string;
@@ -36,10 +37,10 @@ export const useTransactionStore = create<TransactionState>()(
         )
       })),
 
-      deleteTransaction: (id) => set((state) => ({
-        transactions: state.transactions.map(tx => 
-          tx.id === id ? { ...tx, deleted: true, synced: false } : tx
-        )
+      deleteTransaction: (id: string) => set((state) => ({
+        transactions: state.transactions.filter(
+            (t) => String(t.id) !== String(id)
+          ),
       })),
 
     }),
