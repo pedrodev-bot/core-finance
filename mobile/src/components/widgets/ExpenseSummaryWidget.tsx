@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { ExpenseSummaryVariant } from '../../types/widgets';
 import { useAuthStore } from '../../stores/useAuthStore';
 import { useTransactionStore } from '../../stores/transactionStore';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
   variant?: ExpenseSummaryVariant;
@@ -13,6 +14,12 @@ export function ExpenseSummaryWidget({ variant = 'chart_screen_time' }: Props) {
   const [period, setPeriod] = useState<'1M' | '3M'>('1M');
   const currentUserId = useAuthStore((state) => state.user?.id);
   const allTransactions = useTransactionStore((state) => state.transactions);
+
+  const { t } = useTranslation();
+  const periodLabels = {
+    '1M': t('home.widgets.expenseSummary.periods.oneMonth'),
+    '3M': t('home.widgets.expenseSummary.periods.threeMonths'),
+  };
 
   const { dailyData, totalSpent, dailyAverage, maxAmount } = useMemo(() => {
     const today = new Date();
@@ -80,7 +87,7 @@ export function ExpenseSummaryWidget({ variant = 'chart_screen_time' }: Props) {
   if (variant === 'compact') {
     return (
       <View style={styles.card}>
-        <Text style={styles.label}>Gasto Total ({period})</Text>
+        <Text style={styles.label}>{t('home.widgets.predictiveInsight.title')}</Text>
         <Text style={styles.totalValue}>{formatBRL(totalSpent)}</Text>
       </View>
     );
@@ -98,7 +105,12 @@ export function ExpenseSummaryWidget({ variant = 'chart_screen_time' }: Props) {
       <View style={styles.headerRow}>
         <View>
           <Text style={styles.label}>
-            {selectedDayData ? `GASTO EM ${selectedDayData.day}/${String(new Date().getMonth() + 1).padStart(2, '0')}` : 'TOTAL GASTO'}
+            {selectedDayData
+            ? t('home.widgets.expenseSummary.spentOnDay', {
+                day: selectedDayData.day,
+                month: String(new Date().getMonth() + 1).padStart(2, '0'),
+              })
+            : t('home.widgets.expenseSummary.totalSpent')}
           </Text>
           <Text style={styles.totalValue}>
             {formatBRL(selectedDayData ? selectedDayData.amount : totalSpent)}
@@ -118,7 +130,7 @@ export function ExpenseSummaryWidget({ variant = 'chart_screen_time' }: Props) {
                   period === p && styles.periodTextActive,
                 ]}
               >
-                {p}
+                {periodLabels[p]}
               </Text>
             </TouchableOpacity>
           ))}
@@ -126,13 +138,15 @@ export function ExpenseSummaryWidget({ variant = 'chart_screen_time' }: Props) {
       </View>
 
       <Text style={styles.subtext}>
-        {selectedDayData ? 'Toque na barra novamente para ver o mensal' : `Média de ${formatBRL(dailyAverage)}/dia`}
+        {selectedDayData
+        ? t('home.widgets.expenseSummary.tapBarAgain')
+        : t('home.widgets.expenseSummary.dailyAverage', { amount: formatBRL(dailyAverage) })}
       </Text>
 
       <View style={[styles.chartContainer, { height: chartHeight }]}>
         {dailyAverage > 0 && (
           <View style={[styles.averageLine, { bottom: averageLineBottom }]}>
-            <Text style={styles.averageTag}>Média</Text>
+            <Text style={styles.averageTag}>{t('home.widgets.expenseSummary.averageTag')}</Text>
           </View>
         )}
 

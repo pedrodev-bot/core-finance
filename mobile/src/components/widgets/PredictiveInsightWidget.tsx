@@ -2,8 +2,10 @@ import React, { useMemo } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { useTransactionStore } from '../../stores/transactionStore';
 import { useAuthStore } from '../../stores/useAuthStore';
+import { useTranslation } from 'react-i18next';
 
 export function PredictiveInsightWidget() {
+  const { t, i18n } = useTranslation();
   const transactions = useTransactionStore((state) => state.transactions);
   const currentUserId = useAuthStore((state) => state.user?.id);
 
@@ -39,14 +41,17 @@ export function PredictiveInsightWidget() {
   }, [transactions]);
 
   const formatCurrency = (val: number) =>
-    val.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    val.toLocaleString(i18n.language, { style: 'currency', currency: 'BRL' });
 
   return (
     <View style={styles.card}>
-      <Text style={styles.label}>PROJEÇÃO ATÉ AO FIM DO MÊS</Text>
+      <Text style={styles.label}>{t('home.widgets.predictiveInsight.title')}</Text>
       <Text style={styles.projectedValue}>{formatCurrency(projectedTotal)}</Text>
       <Text style={styles.description}>
-        Mantendo o ritmo médio de {formatCurrency(dailyPace)}/dia pelos próximos {daysRemaining} dias.
+        {t('home.widgets.predictiveInsight.description', {
+          amount: formatCurrency(dailyPace),
+          days: daysRemaining,
+        })}
       </Text>
     </View>
   );

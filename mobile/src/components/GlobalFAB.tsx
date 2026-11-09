@@ -3,10 +3,12 @@ import { View, StyleSheet, Pressable, Text, Modal, TouchableOpacity } from 'reac
 import { Ionicons } from '@expo/vector-icons';
 import { usePathname, useRouter } from 'expo-router';
 import { useThemeStore } from '../stores/useThemeStore';
+import { useTranslation } from 'react-i18next';
 
 const VISIBLE_ROUTES = ['/', '/transactions']; 
 
 export function GlobalFAB() {
+  const { t } = useTranslation();
   const pathname = usePathname();
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
@@ -45,7 +47,7 @@ export function GlobalFAB() {
             
             <View style={styles.menuHeader}>
               <Text style={[styles.menuTitle, { color: theme.textPrimary }]}>
-                O que deseja registrar?
+                {t('fab.menuTitle')}
               </Text>
               <TouchableOpacity onPress={() => setIsOpen(false)} style={styles.closeButton}>
                 <Ionicons name="close-circle" size={28} color={theme.textSecondary} />
@@ -59,7 +61,7 @@ export function GlobalFAB() {
               <View style={[styles.iconContainer, { backgroundColor: 'rgba(239, 68, 68, 0.15)' }]}>
                 <Ionicons name="arrow-down" size={20} color={theme.expense} />
               </View>
-              <Text style={[styles.menuText, { color: theme.textPrimary }]}>Despesa</Text>
+              <Text style={[styles.menuText, { color: theme.textPrimary }]}>{t('transactionTypes.expense')}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity 
@@ -69,7 +71,7 @@ export function GlobalFAB() {
               <View style={[styles.iconContainer, { backgroundColor: 'rgba(34, 197, 94, 0.15)' }]}>
                 <Ionicons name="arrow-up" size={20} color={theme.income} />
               </View>
-              <Text style={[styles.menuText, { color: theme.textPrimary }]}>Receita</Text>
+              <Text style={[styles.menuText, { color: theme.textPrimary }]}>{t('transactionTypes.income')}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity 
@@ -79,7 +81,7 @@ export function GlobalFAB() {
               <View style={[styles.iconContainer, { backgroundColor: 'rgba(14, 165, 233, 0.15)' }]}>
                 <Ionicons name="wallet" size={20} color={theme.investment} />
               </View>
-              <Text style={[styles.menuText, { color: theme.textPrimary }]}>Investimento</Text>
+              <Text style={[styles.menuText, { color: theme.textPrimary }]}>{t('transactionTypes.investment')}</Text>
             </TouchableOpacity>
 
           </View>

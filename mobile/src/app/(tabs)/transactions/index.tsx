@@ -6,8 +6,10 @@ import { Ionicons, FontAwesome5 } from '@expo/vector-icons';
 import { useThemeStore } from '../../../stores/useThemeStore';
 import { useTransactionStore, Transaction } from '../../../stores/transactionStore';
 import { useAuthStore } from '../../../stores/useAuthStore';
+import { useTranslation } from 'react-i18next';
 
 export default function TransactionsListScreen() {
+  const { t, i18n } = useTranslation();
   const router = useRouter();
   const theme = useThemeStore((state) => state.theme);
   const currentUserId = useAuthStore((state) => state.user?.id);
@@ -64,13 +66,13 @@ export default function TransactionsListScreen() {
             {item.description}
           </Text>
           <Text style={[styles.cardDate, { color: theme.textSecondary }]}>
-            {new Date(item.date).toLocaleDateString('pt-BR')}
+            {new Date(item.date).toLocaleDateString(i18n.language)}
           </Text>
         </View>
 
         <View style={styles.amountContainer}>
           <Text style={[styles.cardAmount, { color }]}>
-            R$ {item.amount.toFixed(2).replace('.', ',')}
+            {item.amount.toLocaleString(i18n.language, { style: 'currency', currency: 'BRL' })}
           </Text>
           {iconElement}
         </View>
@@ -81,8 +83,8 @@ export default function TransactionsListScreen() {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: theme.background }]} edges={['top', 'left', 'right']}>
       <View style={styles.headerContainer}>
-        <Text style={styles.headerSubtitle}>HISTÓRICO</Text>
-        <Text style={[styles.headerTitle, { color: theme.textPrimary }]}>Minhas Transações</Text>
+        <Text style={styles.headerSubtitle}>{t('transactions.list.headerSubtitle')}</Text>
+        <Text style={[styles.headerTitle, { color: theme.textPrimary }]}>{t('transactions.list.title')}</Text>
       </View>
       <FlatList
         data={transactions}
@@ -92,7 +94,7 @@ export default function TransactionsListScreen() {
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <Text style={[styles.emptyText, { color: theme.textSecondary }]}>
-              Nenhuma transação cadastrada.
+              {t('transactions.list.empty')}
             </Text>
           </View>
         }

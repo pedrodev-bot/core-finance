@@ -5,8 +5,12 @@ import { useTransactionStore } from '../stores/transactionStore';
 import { useAuthStore } from '../stores/useAuthStore';
 import { useThemeStore } from '../stores/useThemeStore';
 import CurrencyInput from 'react-native-currency-input';
+import { useTranslation } from 'react-i18next';
+
 
 export default function NewTransactionScreen() {
+  const { t, i18n } = useTranslation();
+  const isPt = i18n.language.startsWith('pt');
   const router = useRouter();
   const theme = useThemeStore((state) => state.theme);
   const { type } = useLocalSearchParams();
@@ -19,8 +23,9 @@ export default function NewTransactionScreen() {
   const isExpense = type === 'expense';
   const isIncome = type === 'income';
 
-  const screenTitle = isExpense ? 'Nova Despesa' : isIncome ? 'Nova Receita' : 'Novo Investimento';
-  const placeholderText = isExpense ? 'Com o que gastou?' : isIncome ? 'Origem do dinheiro?' : 'Onde investiu?';
+  const txType = isExpense ? 'expense' : isIncome ? 'income' : 'investment';
+  const screenTitle = t(`transactions.new.title.${txType}`);
+  const placeholderText = t(`transactions.new.descriptionPlaceholder.${txType}`);
   const themeColor = isExpense ? theme.expense : isIncome ? theme.income : theme.investment;
 
   const handleSave = () => {
@@ -59,11 +64,11 @@ return (
         value={amount}
         onChangeValue={setAmount}
         prefix="R$ "
-        delimiter="."
-        separator=","
+        delimiter={isPt ? '.' : ','}
+        separator={isPt ? ',' : '.'}
         precision={2}
         minValue={0}
-        placeholder="Valor (R$)"
+        placeholder={t('common.amountPlaceholder')}
         placeholderTextColor={theme.textMuted}
         style={[
           styles.input,
@@ -98,7 +103,7 @@ return (
         style={[styles.button, { backgroundColor: themeColor }]}
         onPress={handleSave}
       >
-        <Text style={styles.buttonText}>Salvar</Text>
+        <Text style={styles.buttonText}>{t('common.save')}</Text>
       </TouchableOpacity>
     </View>
   );

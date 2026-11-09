@@ -1,15 +1,17 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import { useTranslation } from 'react-i18next';
 
 interface HomeHeaderProps {
   userName: string;
 }
 
 export function HomeHeader({ userName }: HomeHeaderProps) {
+  const { t } = useTranslation();
   return (
     <View style={styles.container}>
-      <Text style={styles.subtitle}>Início</Text>
-      <Text style={styles.title}>Olá, {userName}</Text>
+      <Text style={styles.subtitle}>{t('home.header.title')}</Text>
+<Text style={styles.title}>{t('home.header.greeting', { userName })}</Text>
     </View>
   );
 }

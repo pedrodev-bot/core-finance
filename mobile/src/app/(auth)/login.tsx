@@ -12,8 +12,10 @@ import {
 } from 'react-native';
 import { useAuthStore } from '../../stores/useAuthStore';
 import { loginRequest, registerRequest } from '../../services/authService';
+import { useTranslation } from 'react-i18next';
 
 export default function LoginScreen() {
+  const { t } = useTranslation();
   const [isRegistering, setIsRegistering] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -23,7 +25,7 @@ export default function LoginScreen() {
 
   async function handleSubmit() {
     if (!username.trim() || !password.trim()) {
-      Alert.alert('Atenção', 'Preencha usuário e senha.');
+      Alert.alert(t('common.attention'), t('auth.login.alerts.missingCredentials'));
       return;
     }
 
@@ -33,12 +35,12 @@ export default function LoginScreen() {
       const data = await action(username.trim(), password);
 
       if (!data || !data.token || !data.user) {
-      throw new Error('Servidor não retornou os dados de autenticação.');
+      throw new Error(t('auth.login.errors.missingAuthData'));
     }
     
       await login(data.token, data.user);
     } catch (error: any) {
-      Alert.alert('Erro', error.message || 'Falha na requisição.');
+      Alert.alert(t('common.error'), error.message || t('auth.login.errors.requestFailed'));
     } finally {
       setLoading(false);
     }
@@ -50,13 +52,13 @@ export default function LoginScreen() {
       style={styles.container}
     >
       <View style={styles.formCard}>
-        <Text style={styles.brandTitle}>Core Finance</Text>
+        <Text style={styles.brandTitle}>{t('auth.login.brandTitle')}</Text>
         <Text style={styles.subtitle}>
-          {isRegistering ? 'Crie sua conta para começar' : 'Entre com sua conta'}
+          {isRegistering ? t('auth.login.subtitle.register') : t('auth.login.subtitle.signIn')}
         </Text>
 
         <TextInput
-          placeholder="Usuário"
+          placeholder={t('auth.login.placeholders.username')}
           placeholderTextColor="#8E8E93"
           value={username}
           onChangeText={setUsername}
@@ -65,7 +67,7 @@ export default function LoginScreen() {
         />
 
         <TextInput
-          placeholder="Senha"
+          placeholder={t('auth.login.placeholders.password')}
           placeholderTextColor="#8E8E93"
           value={password}
           onChangeText={setPassword}
@@ -82,7 +84,7 @@ export default function LoginScreen() {
             <ActivityIndicator color="#000000" />
           ) : (
             <Text style={styles.buttonText}>
-              {isRegistering ? 'Cadastrar e Entrar' : 'Entrar'}
+              {isRegistering ? t('auth.login.buttons.registerAndSignIn') : t('auth.login.buttons.signIn')}
             </Text>
           )}
         </TouchableOpacity>
@@ -92,9 +94,7 @@ export default function LoginScreen() {
           style={styles.switchButton}
         >
           <Text style={styles.switchText}>
-            {isRegistering
-              ? 'Já tem uma conta? Entrar'
-              : 'Não tem conta? Crie uma agora'}
+            {isRegistering ? t('auth.login.switchMode.toLogin') : t('auth.login.switchMode.toRegister')}
           </Text>
         </TouchableOpacity>
       </View>

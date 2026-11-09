@@ -7,11 +7,13 @@ import { PredictiveInsightWidget } from '../../components/widgets/PredictiveInsi
 import { RecentTransactionsWidget } from '../../components/widgets/RecentTransactionsWidget';
 import { useWidgetStore } from '../../stores/useWidgetStore';
 import { useAuthStore } from '../../stores/useAuthStore';
+import { useTranslation } from 'react-i18next';
 
 export default function HomeScreen() {
+  const { t } = useTranslation();
   const widgets = useWidgetStore((state) => state.widgets);
   const user = useAuthStore((state) => state.user);
-  const displayName = user?.name || user?.username || 'Usuário';
+  const displayName = user?.name || user?.username || t('common.defaultUserName');
 
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>

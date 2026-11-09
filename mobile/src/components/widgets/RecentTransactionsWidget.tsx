@@ -2,8 +2,10 @@ import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';import { useAuthStore } from '../../stores/useAuthStore';
 import { useTransactionStore } from '../../stores/transactionStore';
+import { useTranslation } from 'react-i18next';
 
 export function RecentTransactionsWidget() {
+  const { t, i18n } = useTranslation();
   const router = useRouter();
 
   const currentUserId = useAuthStore((state) => state.user?.id);
@@ -20,25 +22,24 @@ export function RecentTransactionsWidget() {
   }, [userTransactions]);
 
   const formatCurrency = (val: number) =>
-    val.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    val.toLocaleString(i18n.language, { style: 'currency', currency: 'BRL' });
 
   const formatDate = (dateStr: string) => {
-    const d = new Date(dateStr);
-    return d.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' });
+    return new Date(dateStr).toLocaleDateString(i18n.language, { day: '2-digit', month: 'short' });
   };
 
   return (
     <View style={styles.card}>
       <View style={styles.header}>
-        <Text style={styles.title}>COMPRAS RECENTES</Text>
+        <Text style={styles.title}>{t('home.widgets.recentTransactions.title')}</Text>
         <TouchableOpacity onPress={() => router.push('/(tabs)/transactions' as any)}>
-          <Text style={styles.linkText}>Ver todas</Text>
+          <Text style={styles.linkText}>{t('home.widgets.recentTransactions.seeAll')}</Text>
         </TouchableOpacity>
       </View>
 
       {recentTransactions.length === 0 ? (
         <View style={styles.emptyContainer}>
-          <Text style={styles.emptyText}>Nenhuma transação recente encontrada.</Text>
+          <Text style={styles.emptyText}>{t('home.widgets.recentTransactions.empty')}</Text>
         </View>
       ) : (
         <View style={styles.list}>
@@ -53,10 +54,10 @@ export function RecentTransactionsWidget() {
               >
                 <View style={styles.infoCol}>
                   <Text style={styles.itemTitle} numberOfLines={1}>
-                    {item.description || 'Transação'}
+                    {item.description || t('home.widgets.recentTransactions.fallbackDescription')}
                   </Text>
                   <Text style={styles.itemDate}>
-                    {formatDate(item.date)} • {item.type === 'expense' ? 'Despesa' : item.type === 'income' ? 'Receita' : 'Investimento'}
+                    {formatDate(item.date)} • {t(`transactionTypes.${item.type}`)}
                   </Text>
                 </View>
 

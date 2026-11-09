@@ -1,8 +1,11 @@
 import { useEffect } from 'react';
 import { Stack, useRouter, useSegments } from 'expo-router';
 import { useAuthStore } from '../stores/useAuthStore';
+import '../locales/i18n';
+import { useTranslation } from 'react-i18next';
 
 export default function RootLayout() {
+  const { ready } = useTranslation();
   const { isAuthenticated, isLoading, loadSession } = useAuthStore();
   const segments = useSegments();
   const router = useRouter();
@@ -12,7 +15,7 @@ export default function RootLayout() {
   }, [loadSession]);
 
   useEffect(() => {
-    if (isLoading) return;
+    if (isLoading || !ready) return;
 
     const inAuthGroup = segments[0] === '(auth)';
 

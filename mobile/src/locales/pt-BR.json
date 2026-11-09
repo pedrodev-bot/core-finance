@@ -1,0 +1,128 @@
+{
+  "common": {
+    "save": "Salvar",
+    "cancel": "Cancelar",
+    "delete": "Excluir",
+    "attention": "Atenção",
+    "error": "Erro",
+    "defaultUserName": "Usuário",
+    "amountPlaceholder": "R$ 0,00"
+  },
+  "transactionTypes": {
+    "expense": "Despesa",
+    "income": "Receita",
+    "investment": "Investimento"
+  },
+  "navigation": {
+    "tabs": {
+      "home": "Início",
+      "transactions": "Transações",
+      "menu": "Menu"
+    },
+    "menuModal": {
+      "title": "Navegação",
+      "items": {
+        "home": "Início",
+        "transactions": "Transações"
+      }
+    }
+  },
+  "auth": {
+    "login": {
+      "brandTitle": "Core Finance",
+      "subtitle": {
+        "signIn": "Acesse sua conta",
+        "register": "Crie sua conta"
+      },
+      "placeholders": {
+        "username": "Nome de usuário",
+        "password": "Senha"
+      },
+      "buttons": {
+        "signIn": "Entrar",
+        "registerAndSignIn": "Cadastrar e Entrar"
+      },
+      "switchMode": {
+        "toRegister": "Não tem uma conta? Cadastre-se",
+        "toLogin": "Já tem uma conta? Entre"
+      },
+      "alerts": {
+        "missingCredentials": "Por favor, preencha todos os campos."
+      },
+      "errors": {
+        "requestFailed": "Falha na requisição. Tente novamente.",
+        "missingAuthData": "Dados de autenticação ausentes."
+      }
+    },
+    "errors": {
+      "loginFailed": "Usuário ou senha incorretos.",
+      "registerFailed": "Não foi possível criar a conta."
+    }
+  },
+  "home": {
+    "header": {
+      "title": "Resumo",
+      "greeting": "Olá, {{name}}"
+    },
+    "widgets": {
+      "expenseSummary": {
+        "totalSpentWithPeriod": "Total gasto ({{period}})",
+        "totalSpent": "Total gasto",
+        "spentOnDay": "Gasto no dia {{day}}/{{month}}",
+        "tapBarAgain": "Toque na barra novamente para fechar",
+        "dailyAverage": "Média de {{amount}}/dia",
+        "averageTag": "média",
+        "periods": {
+          "oneMonth": "1M",
+          "threeMonths": "3M"
+        }
+      },
+      "predictiveInsight": {
+        "title": "Previsão",
+        "description": "Mantendo o ritmo médio de {{amount}}/dia pelos próximos {{days}} dias."
+      },
+      "recentTransactions": {
+        "title": "Transações Recentes",
+        "seeAll": "Ver todas",
+        "empty": "Nenhuma transação recente.",
+        "fallbackDescription": "Sem descrição"
+      }
+    }
+  },
+  "transactions": {
+    "list": {
+      "headerSubtitle": "Seu histórico",
+      "title": "Transações",
+      "empty": "Nenhuma transação encontrada."
+    },
+    "new": {
+      "title": {
+        "expense": "Nova Despesa",
+        "income": "Nova Receita",
+        "investment": "Novo Investimento"
+      },
+      "descriptionPlaceholder": {
+        "expense": "Ex: Mercado, Conta de Luz...",
+        "income": "Ex: Salário, Freelance...",
+        "investment": "Ex: Tesouro Direto, Ações..."
+      }
+    },
+    "edit": {
+      "title": "Editar Transação",
+      "descriptionPlaceholder": "Descrição da transação",
+      "notFound": "Transação não encontrada.",
+      "buttons": {
+        "update": "Atualizar",
+        "delete": "Excluir"
+      },
+      "deleteModal": {
+        "title": "Excluir Transação",
+        "description": "Tem certeza que deseja excluir esta transação? Esta ação não pode ser desfeita.",
+        "confirm": "Sim, excluir"
+      }
+    }
+  },
+  "fab": {
+    "menuTitle": "Adicionar"
+  }
+}

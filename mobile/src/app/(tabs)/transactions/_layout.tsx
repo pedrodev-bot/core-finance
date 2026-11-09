@@ -1,7 +1,10 @@
 import { Stack } from 'expo-router';
 import { useThemeStore } from '../../../stores/useThemeStore';
+import { useTranslation } from 'react-i18next';
+
 
 export default function TransactionsLayout() {
+  const { t } = useTranslation();
   const theme = useThemeStore((state) => state.theme);
 
   return (
@@ -21,7 +24,7 @@ export default function TransactionsLayout() {
       <Stack.Screen
         name="index"
         options={{
-          title: 'Minhas Transações',
+          title: t('transactions.list.title'),
         }}
       />
     </Stack>

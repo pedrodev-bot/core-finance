@@ -4,8 +4,10 @@ import { View, Text, StyleSheet, Modal, TouchableOpacity, TouchableWithoutFeedba
 import { Ionicons } from '@expo/vector-icons';
 import { useThemeStore } from '../../stores/useThemeStore';
 import { GlobalFAB } from '../../components/GlobalFAB';
+import { useTranslation } from 'react-i18next';
 
 export default function TabLayout() {
+  const { t } = useTranslation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const router = useRouter();
   const theme = useThemeStore((state) => state.theme);
@@ -46,7 +48,7 @@ export default function TabLayout() {
         <Tabs.Screen
           name="index"
           options={{
-            title: 'Início',
+            title: t('navigation.tabs.home'),
             headerShown: false,
             tabBarIcon: ({ color }: any) => <Ionicons name="home-outline" size={22} color={color} />,
           }}
@@ -54,7 +56,7 @@ export default function TabLayout() {
         <Tabs.Screen
           name="transactions"
           options={{
-            title: 'Transações',
+            title: t('navigation.tabs.transactions'),
             headerShown: false,
             tabBarIcon: ({ color }: any) => <Ionicons name="wallet-outline" size={22} color={color} />,
           }}
@@ -62,7 +64,7 @@ export default function TabLayout() {
         <Tabs.Screen
           name="menu"
           options={{
-            title: 'Menu',
+            title: t('navigation.tabs.menu'),
             tabBarIcon: ({ color }: any) => <Ionicons name="menu-outline" size={22} color={color} />,
           }}
           listeners={{
@@ -96,7 +98,7 @@ export default function TabLayout() {
                 ]}
               >
                 <View style={[styles.boxHeader, { borderBottomColor: theme.cardBorder }]}>
-                  <Text style={[styles.boxTitle, { color: theme.textPrimary }]}>Navegação</Text>
+                  <Text style={[styles.boxTitle, { color: theme.textPrimary }]}>{t('navigation.menuModal.title')}</Text>
                   <TouchableOpacity
                     onPress={() => setIsMenuOpen(false)}
                     hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
@@ -111,7 +113,7 @@ export default function TabLayout() {
                   onPress={() => handleNavigate('/')}
                 >
                   <Ionicons name="home-outline" size={20} color={theme.textPrimary} />
-                  <Text style={[styles.menuText, { color: theme.textPrimary }]}>Início</Text>
+                  <Text style={[styles.menuText, { color: theme.textPrimary }]}>{t('navigation.menuModal.items.home')}</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
@@ -120,7 +122,7 @@ export default function TabLayout() {
                   onPress={() => handleNavigate('/transactions')}
                 >
                   <Ionicons name="wallet-outline" size={20} color={theme.textPrimary} />
-                  <Text style={[styles.menuText, { color: theme.textPrimary }]}>Transações</Text>
+                  <Text style={[styles.menuText, { color: theme.textPrimary }]}>{t('navigation.menuModal.items.transactions')}</Text>
                 </TouchableOpacity>
               </View>
             </TouchableWithoutFeedback>

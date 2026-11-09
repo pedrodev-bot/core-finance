@@ -1,5 +1,6 @@
 import { API_BASE_URL } from './api';
 import { Platform } from 'react-native';
+import i18n from '../locales/i18n';
 
 const BASE_URL = Platform.OS === 'android' ? 'http://10.0.2.2:8000' : 'http://localhost:8000';
 const TOKEN_KEY = 'core_finance_auth_token';
@@ -23,7 +24,7 @@ export async function loginRequest(username: string, password: string): Promise<
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.detail || 'Falha ao autenticar.');
+    throw new Error(errorData.detail || i18n.t('auth.errors.loginFailed'));
   }
 
   return response.json();

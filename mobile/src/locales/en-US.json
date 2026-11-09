@@ -1,0 +1,128 @@
+{
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "attention": "Attention",
+    "error": "Error",
+    "defaultUserName": "User",
+    "amountPlaceholder": "$ 0.00"
+  },
+  "transactionTypes": {
+    "expense": "Expense",
+    "income": "Income",
+    "investment": "Investment"
+  },
+  "navigation": {
+    "tabs": {
+      "home": "Home",
+      "transactions": "Transactions",
+      "menu": "Menu"
+    },
+    "menuModal": {
+      "title": "Navigation",
+      "items": {
+        "home": "Home",
+        "transactions": "Transactions"
+      }
+    }
+  },
+  "auth": {
+    "login": {
+      "brandTitle": "Core Finance",
+      "subtitle": {
+        "signIn": "Sign in to your account",
+        "register": "Create an account"
+      },
+      "placeholders": {
+        "username": "Username",
+        "password": "Password"
+      },
+      "buttons": {
+        "signIn": "Sign In",
+        "registerAndSignIn": "Register & Sign In"
+      },
+      "switchMode": {
+        "toRegister": "Don't have an account? Sign up",
+        "toLogin": "Already have an account? Sign in"
+      },
+      "alerts": {
+        "missingCredentials": "Please fill in all fields."
+      },
+      "errors": {
+        "requestFailed": "Request failed. Please try again.",
+        "missingAuthData": "Missing authentication data."
+      }
+    },
+    "errors": {
+      "loginFailed": "Invalid username or password.",
+      "registerFailed": "Could not create account."
+    }
+  },
+  "home": {
+    "header": {
+      "title": "Overview",
+      "greeting": "Hello, {{name}}"
+    },
+    "widgets": {
+      "expenseSummary": {
+        "totalSpentWithPeriod": "Total spent ({{period}})",
+        "totalSpent": "Total spent",
+        "spentOnDay": "Spent on day {{month}}/{{day}}",
+        "tapBarAgain": "Tap bar again to close",
+        "dailyAverage": "Daily average of {{amount}}/day",
+        "averageTag": "Average",
+        "periods": {
+          "oneMonth": "1M",
+          "threeMonths": "3M"
+        }
+      },
+      "predictiveInsight": {
+        "title": "Insight",
+        "description": "At an average pace of {{amount}}/day for the next {{days}} days."
+      },
+      "recentTransactions": {
+        "title": "Recent Transactions",
+        "seeAll": "See all",
+        "empty": "No recent transactions.",
+        "fallbackDescription": "No description"
+      }
+    }
+  },
+  "transactions": {
+    "list": {
+      "headerSubtitle": "Your history",
+      "title": "Transactions",
+      "empty": "No transactions found."
+    },
+    "new": {
+      "title": {
+        "expense": "New Expense",
+        "income": "New Income",
+        "investment": "New Investment"
+      },
+      "descriptionPlaceholder": {
+        "expense": "E.g.: Groceries, Electric Bill...",
+        "income": "E.g.: Salary, Freelance...",
+        "investment": "E.g.: Stocks, Bonds..."
+      }
+    },
+    "edit": {
+      "title": "Edit Transaction",
+      "descriptionPlaceholder": "Transaction description",
+      "notFound": "Transaction not found.",
+      "buttons": {
+        "update": "Update",
+        "delete": "Delete"
+      },
+      "deleteModal": {
+        "title": "Delete Transaction",
+        "description": "Are you sure you want to delete this transaction? This action cannot be undone.",
+        "confirm": "Yes, delete"
+      }
+    }
+  },
+  "fab": {
+    "menuTitle": "Add"
+  }
+}

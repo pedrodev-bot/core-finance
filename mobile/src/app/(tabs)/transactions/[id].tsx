@@ -5,8 +5,11 @@ import { Ionicons } from '@expo/vector-icons';
 import CurrencyInput from 'react-native-currency-input';
 import { useTransactionStore } from '../../../stores/transactionStore';
 import { useThemeStore } from '../../../stores/useThemeStore';
+import { useTranslation } from 'react-i18next';
 
 export default function EditTransactionScreen() {
+  const { t, i18n } = useTranslation();
+  const isPt = i18n.language.startsWith('pt');
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const theme = useThemeStore((state) => state.theme);
@@ -31,7 +34,7 @@ export default function EditTransactionScreen() {
   if (!currentTransaction) {
     return (
       <View style={[styles.container, { backgroundColor: theme.background, justifyContent: 'center', alignItems: 'center' }]}>
-        <Text style={{ color: theme.textSecondary }}>Transação não encontrada.</Text>
+        <Text style={{ color: theme.textSecondary }}>{t('transactions.edit.notFound')}</Text>
       </View>
     );
   }
@@ -63,7 +66,7 @@ export default function EditTransactionScreen() {
       <Stack.Screen
         options={{
           headerShown: true,
-          title: 'Editar Transação',
+          title: t('transactions.edit.title'), 
           headerTintColor: theme.textPrimary,
           headerTitleStyle: { fontWeight: '700' },
           headerStyle: { backgroundColor: theme.background },
@@ -75,11 +78,11 @@ export default function EditTransactionScreen() {
         value={amount}
         onChangeValue={setAmount}
         prefix="R$ "
-        delimiter="."
-        separator=","
+        delimiter={isPt ? '.' : ','}
+        separator={isPt ? ',' : '.'}
         precision={2}
         minValue={0}
-        placeholder="Valor (R$)"
+        placeholder={t('common.amountPlaceholder')}
         placeholderTextColor={theme.textMuted}
         style={[
           styles.input,
@@ -94,7 +97,7 @@ export default function EditTransactionScreen() {
       />
 
       <TextInput
-        placeholder="Descrição da transação"
+        placeholder={t('transactions.edit.descriptionPlaceholder')}
         placeholderTextColor={theme.textMuted}
         value={description}
         onChangeText={setDescription}
@@ -115,7 +118,7 @@ export default function EditTransactionScreen() {
         activeOpacity={0.8}
         onPress={handleUpdate}
       >
-        <Text style={styles.primaryButtonText}>Atualizar Transação</Text>
+        <Text style={styles.primaryButtonText}>{t('transactions.edit.buttons.update')}</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
@@ -123,7 +126,7 @@ export default function EditTransactionScreen() {
         activeOpacity={0.8}
         onPress={() => setShowDeleteModal(true)}
       >
-        <Text style={[styles.deleteButtonText, { color: theme.expense }]}>Deletar Transação</Text>
+        <Text style={[styles.deleteButtonText, { color: theme.expense }]}>{t('transactions.edit.buttons.delete')}</Text>
       </TouchableOpacity>
 
       <Modal
@@ -147,11 +150,11 @@ export default function EditTransactionScreen() {
                 </View>
 
                 <Text style={[styles.modalTitle, { color: theme.textPrimary }]}>
-                  Excluir transação?
+                  {t('transactions.edit.deleteModal.title')}
                 </Text>
 
                 <Text style={[styles.modalDescription, { color: theme.textSecondary }]}>
-                  Esta ação não pode ser desfeita. O registro será removido permanentemente.
+                  {t('transactions.edit.deleteModal.description')}
                 </Text>
 
                 <View style={styles.modalButtonsRow}>
@@ -160,7 +163,7 @@ export default function EditTransactionScreen() {
                     onPress={() => setShowDeleteModal(false)}
                   >
                     <Text style={[styles.cancelButtonText, { color: theme.textPrimary }]}>
-                      Cancelar
+                      {t('common.cancel')}
                     </Text>
                   </TouchableOpacity>
 
@@ -168,7 +171,7 @@ export default function EditTransactionScreen() {
                     style={[styles.confirmDeleteButton, { backgroundColor: theme.expense }]}
                     onPress={confirmDelete}
                   >
-                    <Text style={styles.confirmDeleteText}>Excluir</Text>
+                    <Text style={styles.confirmDeleteText}>{t('transactions.edit.deleteModal.confirm')}</Text>
                   </TouchableOpacity>
                 </View>
               </View>
