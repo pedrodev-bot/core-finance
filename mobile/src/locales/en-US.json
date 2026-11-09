@@ -68,13 +68,15 @@
       "expenseSummary": {
         "totalSpentWithPeriod": "Total spent ({{period}})",
         "totalSpent": "Total spent",
-        "spentOnDay": "Spent on day {{month}}/{{day}}",
+        "spentOnDay": "Spent on {{month}}/{{day}}",
+        "spentOnPeriod": "Spent from {{start}} to {{end}}",
         "tapBarAgain": "Tap bar again to close",
         "dailyAverage": "Daily average of {{amount}}/day",
+        "weeklyAverage": "Weekly average of {{amount}}/week",
         "averageTag": "Average",
         "periods": {
-          "oneMonth": "1M",
-          "threeMonths": "3M"
+          "oneWeek": "1S",
+          "oneMonth": "1M"
         }
       },
       "predictiveInsight": {

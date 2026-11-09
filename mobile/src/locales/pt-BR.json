@@ -69,12 +69,14 @@
         "totalSpentWithPeriod": "Total gasto ({{period}})",
         "totalSpent": "Total gasto",
         "spentOnDay": "Gasto no dia {{day}}/{{month}}",
+        "spentOnPeriod": "Gasto de {{start}} a {{end}}",
         "tapBarAgain": "Toque na barra novamente para fechar",
         "dailyAverage": "Média de {{amount}}/dia",
+        "weeklyAverage": "Média semanal de {{amount}}/semana",
         "averageTag": "média",
         "periods": {
-          "oneMonth": "1M",
-          "threeMonths": "3M"
+          "oneWeek": "1S",
+          "oneMonth": "1M"
         }
       },
       "predictiveInsight": {

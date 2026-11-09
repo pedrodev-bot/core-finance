@@ -10,73 +10,112 @@ interface Props {
 }
 
 export function ExpenseSummaryWidget({ variant = 'chart_screen_time' }: Props) {
-  const [selectedDayData, setSelectedDayData] = useState<{ day: string; amount: number } | null>(null);
-  const [period, setPeriod] = useState<'1M' | '3M'>('1M');
+  const [selectedBarData, setSelectedBarData] = useState<{ 
+    label: string; 
+    amount: number; 
+    isMonth: boolean; 
+    startStr?: string; 
+    endStr?: string 
+  } | null>(null);
+  const [period, setPeriod] = useState<'1S' | '1M'>('1S');
   const currentUserId = useAuthStore((state) => state.user?.id);
   const allTransactions = useTransactionStore((state) => state.transactions);
 
   const { t } = useTranslation();
   const periodLabels = {
+    '1S': t('home.widgets.expenseSummary.periods.oneWeek'),
     '1M': t('home.widgets.expenseSummary.periods.oneMonth'),
-    '3M': t('home.widgets.expenseSummary.periods.threeMonths'),
   };
 
-  const { dailyData, totalSpent, dailyAverage, maxAmount } = useMemo(() => {
+  const { chartData, totalSpent, averageValue, maxAmount } = useMemo(() => {
     const today = new Date();
-    const currentDay = today.getDate();
-    const currentMonth = today.getMonth();
-    const currentYear = today.getFullYear();
+    today.setHours(0, 0, 0, 0);
 
-    const expenses = allTransactions.filter((t) => {
-      if (t.userId !== currentUserId) return false;
-      if (t.type !== 'expense') return false;
-      const tDate = new Date(t.date);
+    const userExpenses = allTransactions.filter(
+      (t) => t.userId === currentUserId && t.type === 'expense'
+    );
 
-      if (period === '1M') {
-        return (
-          tDate.getFullYear() === currentYear &&
-          tDate.getMonth() === currentMonth &&
-          tDate.getDate() <= currentDay
-        );
-      }
+    let calculatedData: { label: string; amount: number; isMonth: boolean; startStr?: string; endStr?: string }[] = [];
+    let activeExpenses: typeof userExpenses = [];
+    let calculatedAverage = 0;
 
-      const ninetyDaysAgo = new Date();
-      ninetyDaysAgo.setDate(today.getDate() - 90);
-      return tDate >= ninetyDaysAgo && tDate <= today;
-    });
+    if (period === '1S') {
+      const startDate = new Date(today);
+      startDate.setDate(today.getDate() - 6);
 
-    const daysToShow = 7;
-    const startDay = Math.max(1, currentDay - daysToShow + 1);
+      activeExpenses = userExpenses.filter((t) => {
+        const tDate = new Date(t.date);
+        tDate.setHours(0, 0, 0, 0);
+        return tDate >= startDate && tDate <= today;
+      });
 
-    const calculatedDailyData = Array.from(
-      { length: currentDay - startDay + 1 },
-      (_, index) => {
-        const dayNumber = startDay + index;
-        const dayStr = String(dayNumber).padStart(2, '0');
+      calculatedData = Array.from({ length: 7 }, (_, i) => {
+        const d = new Date(startDate);
+        d.setDate(startDate.getDate() + i);
+        const dayStr = String(d.getDate()).padStart(2, '0');
 
-        const dayTotal = expenses
+        const amount = activeExpenses
           .filter((t) => {
-            const d = new Date(t.date);
-            return (
-              d.getDate() === dayNumber &&
-              d.getMonth() === currentMonth &&
-              d.getFullYear() === currentYear
-            );
+            const tDate = new Date(t.date);
+            return tDate.getDate() === d.getDate() && tDate.getMonth() === d.getMonth();
           })
           .reduce((sum, t) => sum + Number(t.amount || 0), 0);
 
-        return { day: dayStr, amount: dayTotal };
-      }
-    );
+        return { label: dayStr, amount, isMonth: false };
+      });
 
-    const total = expenses.reduce((sum, t) => sum + Number(t.amount || 0), 0);
-    const average = currentDay > 0 ? total / currentDay : 0;
-    const max = Math.max(...calculatedDailyData.map((d) => d.amount), 1);
+      const total = activeExpenses.reduce((sum, t) => sum + Number(t.amount || 0), 0);
+      calculatedAverage = total / 7;
+
+    } else {
+      const currentMonth = today.getMonth();
+      const currentYear = today.getFullYear();
+      const lastDayOfMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+      activeExpenses = userExpenses.filter((t) => {
+        const tDate = new Date(t.date);
+        return tDate.getMonth() === currentMonth && tDate.getFullYear() === currentYear;
+      });
+
+      const monthRanges = [
+        { start: 1, end: 7 },
+        { start: 8, end: 14 },
+        { start: 15, end: 21 },
+        { start: 22, end: 28 }
+      ];
+      if (lastDayOfMonth >= 29) {
+        monthRanges.push({ start: 29, end: lastDayOfMonth });
+      }
+
+      calculatedData = monthRanges.map((range) => {
+        const startStr = String(range.start).padStart(2, '0');
+        const endStr = String(range.end).padStart(2, '0');
+        const label = `${startStr}-${endStr}`;
+        
+        const amount = activeExpenses
+          .filter((t) => {
+            const d = new Date(t.date).getDate();
+            return d >= range.start && d <= range.end;
+          })
+          .reduce((sum, t) => sum + Number(t.amount || 0), 0);
+
+        return { label, amount, isMonth: true, startStr, endStr };
+      });
+
+      const total = activeExpenses.reduce((sum, t) => sum + Number(t.amount || 0), 0);
+      
+      const currentDay = today.getDate();
+      const weeksElapsed = Math.min(Math.ceil(currentDay / 7), monthRanges.length);
+      calculatedAverage = total / (weeksElapsed || 1);
+    }
+
+    const total = activeExpenses.reduce((sum, t) => sum + Number(t.amount || 0), 0);
+    const max = Math.max(...calculatedData.map((d) => d.amount), 1);
 
     return {
-      dailyData: calculatedDailyData,
+      chartData: calculatedData,
       totalSpent: total,
-      dailyAverage: average,
+      averageValue: calculatedAverage,
       maxAmount: max,
     };
   }, [allTransactions, currentUserId, period]);
@@ -96,7 +135,7 @@ export function ExpenseSummaryWidget({ variant = 'chart_screen_time' }: Props) {
   const chartHeight = 130;
   const trackHeight = 90;
   const averageLineBottom = Math.min(
-    (dailyAverage / maxAmount) * trackHeight + 24,
+    (averageValue / maxAmount) * trackHeight + 24,
     chartHeight
   );
 
@@ -105,20 +144,26 @@ export function ExpenseSummaryWidget({ variant = 'chart_screen_time' }: Props) {
       <View style={styles.headerRow}>
         <View>
           <Text style={styles.label}>
-            {selectedDayData
-            ? t('home.widgets.expenseSummary.spentOnDay', {
-                day: selectedDayData.day,
-                month: String(new Date().getMonth() + 1).padStart(2, '0'),
-              })
+            {selectedBarData
+            ? (selectedBarData.isMonth 
+                ? t('home.widgets.expenseSummary.spentOnPeriod', { 
+                    start: selectedBarData.startStr,
+                    end: selectedBarData.endStr
+                  })
+                : t('home.widgets.expenseSummary.spentOnDay', {
+                    day: selectedBarData.label,
+                    month: String(new Date().getMonth() + 1).padStart(2, '0'),
+                  })
+              )
             : t('home.widgets.expenseSummary.totalSpent')}
           </Text>
           <Text style={styles.totalValue}>
-            {formatBRL(selectedDayData ? selectedDayData.amount : totalSpent)}
+            {formatBRL(selectedBarData ? selectedBarData.amount : totalSpent)}
           </Text>
         </View>
 
         <View style={styles.periodSelector}>
-          {(['1M', '3M'] as const).map((p) => (
+          {(['1S', '1M'] as const).map((p) => (
             <TouchableOpacity
               key={p}
               onPress={() => setPeriod(p)}
@@ -138,21 +183,24 @@ export function ExpenseSummaryWidget({ variant = 'chart_screen_time' }: Props) {
       </View>
 
       <Text style={styles.subtext}>
-        {selectedDayData
+        {selectedBarData
         ? t('home.widgets.expenseSummary.tapBarAgain')
-        : t('home.widgets.expenseSummary.dailyAverage', { amount: formatBRL(dailyAverage) })}
+        : period === '1S'
+          ? t('home.widgets.expenseSummary.dailyAverage', { amount: formatBRL(averageValue) })
+          : t('home.widgets.expenseSummary.weeklyAverage', { amount: formatBRL(averageValue) })
+        }
       </Text>
 
       <View style={[styles.chartContainer, { height: chartHeight }]}>
-        {dailyAverage > 0 && (
+        {averageValue > 0 && (
           <View style={[styles.averageLine, { bottom: averageLineBottom }]}>
             <Text style={styles.averageTag}>{t('home.widgets.expenseSummary.averageTag')}</Text>
           </View>
         )}
 
         <View style={styles.barsRow}>
-          {dailyData.map((item, index) => {
-            const isSelected = selectedDayData?.day === item.day;
+          {chartData.map((item, index) => {
+            const isSelected = selectedBarData?.label === item.label;
             const barFillHeight =
               maxAmount > 0 ? (item.amount / maxAmount) * chartHeight : 0;
 
@@ -161,7 +209,7 @@ export function ExpenseSummaryWidget({ variant = 'chart_screen_time' }: Props) {
                 key={index}
                 activeOpacity={0.7}
                 onPress={() => {
-                  setSelectedDayData(isSelected ? null : item);
+                  setSelectedBarData(isSelected ? null : item);
                 }}
                 style={styles.barColumn}
               >
@@ -177,7 +225,7 @@ export function ExpenseSummaryWidget({ variant = 'chart_screen_time' }: Props) {
                   />
                 </View>
                 <Text style={[styles.barLabel, isSelected && { color: '#FFFFFF', fontWeight: '700' }]}>
-                  {item.day}
+                  {item.label}
                 </Text>
               </TouchableOpacity>
             );
