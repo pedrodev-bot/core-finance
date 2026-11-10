@@ -23,8 +23,24 @@
       "title": "Navegação",
       "items": {
         "home": "Início",
-        "transactions": "Transações"
+        "transactions": "Transações",
+        "others": "Outros"
       }
+    }
+  },
+  "options": {
+    "header": "Outras Opções",
+    "settings": {
+      "title": "Configurações",
+      "subtitle": "Idioma, tema e preferências"
+    },
+    "investments": {
+      "title": "Investimentos",
+      "subtitle": "Gerencie sua carteira"
+    },
+    "vaults": {
+      "title": "Cofrinhos",
+      "subtitle": "Suas metas financeiras"
     }
   },
   "auth": {

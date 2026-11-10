@@ -23,8 +23,24 @@
       "title": "Navigation",
       "items": {
         "home": "Home",
-        "transactions": "Transactions"
+        "transactions": "Transactions",
+        "others": "Others"
       }
+    }
+  },
+  "options": {
+    "header": "Other Options",
+    "settings": {
+      "title": "Settings",
+      "subtitle": "Language, theme and preferences"
+    },
+    "investments": {
+      "title": "Investments",
+      "subtitle": "Manage your portfolio"
+    },
+    "vaults": {
+      "title": "Vaults",
+      "subtitle": "Your financial goals"
     }
   },
   "auth": {

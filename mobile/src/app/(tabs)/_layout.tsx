@@ -124,6 +124,18 @@ export default function TabLayout() {
                   <Ionicons name="wallet-outline" size={20} color={theme.textPrimary} />
                   <Text style={[styles.menuText, { color: theme.textPrimary }]}>{t('navigation.menuModal.items.transactions')}</Text>
                 </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.menuItem}
+                  activeOpacity={0.7}
+                  onPress={() => {
+                    setIsMenuOpen(false);
+                    router.push('/options' as any);
+                  }}
+                >
+                  <Ionicons name="ellipsis-horizontal-outline" size={20} color={theme.textPrimary} />
+                  <Text style={[styles.menuText, { color: theme.textPrimary }]}>{t('navigation.menuModal.items.others')}</Text>
+                </TouchableOpacity>
               </View>
             </TouchableWithoutFeedback>
           </View>
