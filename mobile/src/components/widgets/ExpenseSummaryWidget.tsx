@@ -3,7 +3,8 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { ExpenseSummaryVariant } from '../../types/widgets';
 import { useAuthStore } from '../../stores/useAuthStore';
 import { useTransactionStore } from '../../stores/transactionStore';
-import { useTranslation } from 'react-i18next';
+import { useUIStore } from '../../stores/useUIStore';
+import { useTranslation, Trans } from 'react-i18next';
 
 interface Props {
   variant?: ExpenseSummaryVariant;
@@ -20,6 +21,7 @@ export function ExpenseSummaryWidget({ variant = 'chart_screen_time' }: Props) {
   const [period, setPeriod] = useState<'1S' | '1M'>('1S');
   const currentUserId = useAuthStore((state) => state.user?.id);
   const allTransactions = useTransactionStore((state) => state.transactions);
+  const isValuesHidden = useUIStore((state) => state.isValuesHidden);
 
   const { t } = useTranslation();
   const periodLabels = {
@@ -28,6 +30,7 @@ export function ExpenseSummaryWidget({ variant = 'chart_screen_time' }: Props) {
   };
 
   const { chartData, totalSpent, averageValue, maxAmount } = useMemo(() => {
+    const isValuesHidden = useUIStore((state) => state.isValuesHidden);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
@@ -127,7 +130,13 @@ export function ExpenseSummaryWidget({ variant = 'chart_screen_time' }: Props) {
     return (
       <View style={styles.card}>
         <Text style={styles.label}>{t('home.widgets.predictiveInsight.title')}</Text>
-        <Text style={styles.totalValue}>{formatBRL(totalSpent)}</Text>
+        {isValuesHidden ? (
+          <View style={styles.hiddenSkeletonLarge} />
+        ) : (
+          <Text style={styles.totalValue}>
+            {formatBRL(variant === 'compact' ? totalSpent : (selectedBarData ? selectedBarData.amount : totalSpent))}
+          </Text>
+        )}
       </View>
     );
   }
@@ -158,7 +167,13 @@ export function ExpenseSummaryWidget({ variant = 'chart_screen_time' }: Props) {
             : t('home.widgets.expenseSummary.totalSpent')}
           </Text>
           <Text style={styles.totalValue}>
-            {formatBRL(selectedBarData ? selectedBarData.amount : totalSpent)}
+            {isValuesHidden ? (
+              <View style={styles.hiddenSkeletonLarge} />
+            ) : (
+              <Text style={styles.totalValue}>
+                {formatBRL(selectedBarData ? selectedBarData.amount : totalSpent)}
+              </Text>
+            )}
           </Text>
         </View>
 
@@ -185,14 +200,28 @@ export function ExpenseSummaryWidget({ variant = 'chart_screen_time' }: Props) {
       <Text style={styles.subtext}>
         {selectedBarData
         ? t('home.widgets.expenseSummary.tapBarAgain')
-        : period === '1S'
-          ? t('home.widgets.expenseSummary.dailyAverage', { amount: formatBRL(averageValue) })
-          : t('home.widgets.expenseSummary.weeklyAverage', { amount: formatBRL(averageValue) })
+        : <Trans 
+            i18nKey={
+              period === '1S' 
+                ? 'home.widgets.expenseSummary.dailyAverage' 
+                : 'home.widgets.expenseSummary.weeklyAverage'
+            }
+            values={{
+              amount: isValuesHidden ? '' : formatBRL(averageValue)
+            }}
+            components={{
+              val: isValuesHidden ? (
+                <View style={styles.hiddenSkeletonTextGreen} />
+              ) : (
+                <Text style={{}} />
+              )
+            }}
+          />
         }
       </Text>
 
       <View style={[styles.chartContainer, { height: chartHeight }]}>
-        {averageValue > 0 && (
+        {!isValuesHidden && averageValue > 0 && (
           <View style={[styles.averageLine, { bottom: averageLineBottom }]}>
             <Text style={styles.averageTag}>{t('home.widgets.expenseSummary.averageTag')}</Text>
           </View>
@@ -218,7 +247,9 @@ export function ExpenseSummaryWidget({ variant = 'chart_screen_time' }: Props) {
                     style={[
                       styles.barFill,
                       {
-                        height: Math.max(barFillHeight, item.amount > 0 ? 8 : 0),
+                        height: isValuesHidden 
+                          ? 0 
+                          : Math.max(barFillHeight, item.amount > 0 ? 8 : 0),
                         backgroundColor: isSelected ? '#a3e635' : '#0A84FF',
                       },
                     ]}
@@ -339,5 +370,20 @@ const styles = StyleSheet.create({
     color: '#8E8E93',
     fontSize: 11,
     marginTop: 6,
+  },
+  hiddenSkeletonLarge: {
+    height: 26,
+    width: 140,
+    backgroundColor: '#2A2A32',
+    borderRadius: 6,
+    marginTop: 6,
+  },
+  hiddenSkeletonTextGreen: {
+    height: 14,
+    width: 60,
+    backgroundColor: '#22c55e',
+    borderRadius: 4,
+    marginHorizontal: 4,
+    transform: [{ translateY: 2 }], 
   },
 });

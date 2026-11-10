@@ -2,12 +2,16 @@ import React, { useMemo } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { useTransactionStore } from '../../stores/transactionStore';
 import { useAuthStore } from '../../stores/useAuthStore';
-import { useTranslation } from 'react-i18next';
+import { useUIStore } from '../../stores/useUIStore';
+import { useTranslation, Trans } from 'react-i18next';
 
 export function PredictiveInsightWidget() {
   const { t, i18n } = useTranslation();
+  const rawMonthName = new Date().toLocaleString(i18n.language, { month: 'long' });
+  const currentMonth = rawMonthName.charAt(0).toUpperCase() + rawMonthName.slice(1);
   const transactions = useTransactionStore((state) => state.transactions);
   const currentUserId = useAuthStore((state) => state.user?.id);
+  const isValuesHidden = useUIStore((state) => state.isValuesHidden);
 
   const { dailyPace, daysRemaining, projectedTotal } = useMemo(() => {
     const today = new Date();
@@ -45,13 +49,29 @@ export function PredictiveInsightWidget() {
 
   return (
     <View style={styles.card}>
-      <Text style={styles.label}>{t('home.widgets.predictiveInsight.title')}</Text>
-      <Text style={styles.projectedValue}>{formatCurrency(projectedTotal)}</Text>
+      <Text style={styles.label}>
+        {t('home.widgets.predictiveInsight.title')} • {currentMonth}
+      </Text>
+      {isValuesHidden ? (
+        <View style={styles.hiddenSkeletonLarge} />
+      ) : (
+        <Text style={styles.projectedValue}>{formatCurrency(projectedTotal)}</Text>
+      )}
       <Text style={styles.description}>
-        {t('home.widgets.predictiveInsight.description', {
-          amount: formatCurrency(dailyPace),
-          days: daysRemaining,
-        })}
+        <Trans 
+          i18nKey="home.widgets.predictiveInsight.description"
+          values={{ 
+            days: daysRemaining,
+            amount: isValuesHidden ? '' : formatCurrency(dailyPace)
+          }}
+          components={{
+            val: isValuesHidden ? (
+              <View style={styles.hiddenSkeletonTextGray} />
+            ) : (
+              <Text style={{ color: '#FFFFFF' }} /> 
+            )
+          }}
+        />
       </Text>
     </View>
   );
@@ -78,10 +98,25 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     marginTop: 6,
   },
+  hiddenSkeletonLarge: {
+    height: 26,
+    width: 140,
+    backgroundColor: '#2A2A32',
+    borderRadius: 6,
+    marginTop: 6,
+  },
   description: {
     fontSize: 13,
     color: '#A1A1AA',
     marginTop: 6,
     lineHeight: 18,
+  },
+  hiddenSkeletonTextGray: {
+    height: 14,
+    width: 60,
+    backgroundColor: '#3f3f46',
+    borderRadius: 4,
+    marginHorizontal: 4,
+    transform: [{ translateY: 2 }], 
   },
 });

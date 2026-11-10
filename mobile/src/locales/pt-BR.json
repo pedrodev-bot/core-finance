@@ -71,8 +71,9 @@
         "spentOnDay": "Gasto no dia {{day}}/{{month}}",
         "spentOnPeriod": "Gasto de {{start}} a {{end}}",
         "tapBarAgain": "Toque na barra novamente para fechar",
-        "dailyAverage": "Média de {{amount}}/dia",
-        "weeklyAverage": "Média semanal de {{amount}}/semana",
+        "dailyAverage": "Média diária de <val>{{amount}}</val>/dia",
+        "weeklyAverage": "Média semanal de <val>{{amount}}</val>/semana",
+        "description": "Num ritmo médio de <val>{{amount}}</val> por dia nos próximos {{days}} dias.",
         "averageTag": "média",
         "periods": {
           "oneWeek": "1S",
@@ -81,7 +82,7 @@
       },
       "predictiveInsight": {
         "title": "Previsão",
-        "description": "Mantendo o ritmo médio de {{amount}}/dia pelos próximos {{days}} dias."
+        "description": "Num ritmo médio de <val>{{amount}}</val> por dia nos próximos {{days}} dias."
       },
       "recentTransactions": {
         "title": "Transações Recentes",

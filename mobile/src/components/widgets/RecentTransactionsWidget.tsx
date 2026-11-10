@@ -2,11 +2,13 @@ import React, { useMemo } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';import { useAuthStore } from '../../stores/useAuthStore';
 import { useTransactionStore } from '../../stores/transactionStore';
+import { useUIStore } from '../../stores/useUIStore';
 import { useTranslation } from 'react-i18next';
 
 export function RecentTransactionsWidget() {
   const { t, i18n } = useTranslation();
   const router = useRouter();
+  const isValuesHidden = useUIStore((state) => state.isValuesHidden);
 
   const currentUserId = useAuthStore((state) => state.user?.id);
   const allTransactions = useTransactionStore((state) => state.transactions);
@@ -18,7 +20,7 @@ export function RecentTransactionsWidget() {
   const recentTransactions = useMemo(() => {
     return [...userTransactions]
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-      .slice(0, 4);
+      .slice(0, 3);
   }, [userTransactions]);
 
   const formatCurrency = (val: number) =>
@@ -61,15 +63,19 @@ export function RecentTransactionsWidget() {
                   </Text>
                 </View>
 
-                <Text
-                  style={[
-                    styles.itemAmount,
-                    isExpense ? styles.expenseColor : styles.incomeColor,
-                  ]}
-                >
-                  {isExpense ? '- ' : '+ '}
-                  {formatCurrency(Number(item.amount || 0))}
-                </Text>
+                {isValuesHidden ? (
+                  <View style={styles.hiddenSkeletonSmall} />
+                ) : (
+                  <Text
+                    style={[
+                      styles.itemAmount,
+                      isExpense ? styles.expenseColor : styles.incomeColor,
+                    ]}
+                  >
+                    {isExpense ? '- ' : '+ '}
+                    {formatCurrency(Number(item.amount || 0))}
+                  </Text>
+                )}
               </View>
             );
           })}
@@ -149,5 +155,11 @@ const styles = StyleSheet.create({
   },
   incomeColor: {
     color: '#34C759',
+  },
+  hiddenSkeletonSmall: {
+    height: 18,
+    width: 65,
+    backgroundColor: '#2A2A32',
+    borderRadius: 4,
   },
 });
